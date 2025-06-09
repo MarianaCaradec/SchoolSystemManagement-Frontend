@@ -26,11 +26,10 @@ enum UserRole {
     STUDENT = "student"
 }
 
-interface User {
-    id: number;
+interface AuthenticatedUser {
     email: string;
-    password: string;
     role: UserRole;
+    roleName: string;
 }
 
 interface Student {
@@ -39,9 +38,8 @@ interface Student {
     surname: string;
     birthDate: Date;
     address: string;
-    email: string;
-    phone: number;
-    userRole: UserRole;
+    emailRole: AuthenticatedUser;
+    mobileNumber: number;
     class: Class;
     attendances: Attendance[];
     grades: Grade[];

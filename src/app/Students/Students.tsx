@@ -32,9 +32,9 @@ const Students = () => {
         {students?.map((student) => (
           <li key={`student-${student.id}`}>
             {student.name}- {student.surname} - {student.birthDate?.toString()}{" "}
-            -{student.address} - {student.email} - {student.phone} - Role:{" "}
-            {student.userRole} - Class: {student.class?.course}{" "}
-            {student.class?.divition}
+            -{student.address} - {student.emailRole?.email} -{" "}
+            {student.mobileNumber} - Role: {student.emailRole?.roleName} -
+            Class: {student.class?.course} {student.class?.divition}
             {student.attendances?.length > 0 &&
               student.attendances.map((attendance, index) => {
                 return (
