@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { getStudentById, getStudents } from "../../api/apiHelpers";
+import { getStudentById, getStudents } from "../api/apiHelpers";
+import type { Student } from "../utils/types";
 
 const Students = () => {
   const [students, setStudents] = useState<Student[]>([]);
@@ -10,10 +11,11 @@ const Students = () => {
         const studentsList = await getStudents();
         console.log("Rendered Students:", students);
         const detailedStudents = await Promise.all(
-          studentsList.map(async (student: Student) => {
-            const detailedStudent = await getStudentById(student.id);
-            return detailedStudent || student; // Fallback to the original student if details are not found
-          })
+          studentsList?.length > 0 &&
+            studentsList.map(async (student: Student) => {
+              const detailedStudent = await getStudentById(student.id);
+              return detailedStudent || student; // Fallback to the original student if details are not found
+            })
         );
         setStudents(detailedStudents);
       } catch (error) {
