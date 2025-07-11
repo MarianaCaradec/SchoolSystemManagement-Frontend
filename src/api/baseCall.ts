@@ -5,9 +5,9 @@ console.log("Base API URL:", backendBaseURL);
 
 const api = axios.create({
     baseURL: backendBaseURL,
+    withCredentials: true,
     headers: {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
+        "Content-Type": "application/json"
     }
 })
 
