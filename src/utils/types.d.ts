@@ -1,18 +1,18 @@
-interface Attendance {
+export interface Attendance {
     id: number;
     date: Date;
     present: boolean;
     studentId: number;
 }
 
-interface Grade {
+export interface Grade {
     id: number;
     value: number;
     subjectName: string;
     studentId: number;
 }
 
-interface Class {
+export interface Class {
     id: number;
     course: string;
     divition: string;
@@ -20,19 +20,19 @@ interface Class {
     studentIds: number[];
 }
 
-enum UserRole {
+export enum UserRole {
     ADMIN = "admin",
     TEACHER = "teacher",
     STUDENT = "student"
 }
 
-interface AuthenticatedUser {
+export interface AuthenticatedUser {
     email: string;
     role: UserRole;
     roleName: string;
 }
 
-interface Student {
+export interface Student {
     id: number;
     name: string;
     surname: string;
@@ -43,4 +43,10 @@ interface Student {
     class: Class;
     attendances: Attendance[];
     grades: Grade[];
+}
+
+export interface UserForm {
+    email: string;
+    password: string;
+    roleName?: string;
 }
