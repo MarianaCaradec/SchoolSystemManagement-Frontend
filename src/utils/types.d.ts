@@ -27,6 +27,7 @@ export enum UserRole {
 }
 
 export interface AuthenticatedUser {
+    id: number,
     email: string;
     role: UserRole;
     roleName: string;
@@ -49,4 +50,14 @@ export interface UserForm {
     email: string;
     password: string;
     roleName?: string;
+}
+
+export interface StudentForm {
+    name: string;
+    surname: string;
+    birthDate: Date;
+    address: string;
+    mobileNumber: number;
+    userId: AuthenticatedUser.id;
+    class: Class.id;
 }
