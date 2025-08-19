@@ -6,6 +6,7 @@ import {
 } from "react";
 import type { AuthenticatedUser, UserForm } from "../utils/types";
 import { login, logout, register } from "../api/apiHelpers";
+import { useNavigate } from "react-router-dom";
 
 interface AuthContextType {
   registrationInputValue: UserForm;
@@ -14,6 +15,7 @@ interface AuthContextType {
   setLoginInputValue: React.Dispatch<SetStateAction<UserForm>>;
   user: AuthenticatedUser | null;
   setUser: React.Dispatch<SetStateAction<AuthenticatedUser | null>>;
+  redirectByRole: (user: AuthenticatedUser) => Promise<void>;
   registerHandler: () => Promise<AuthenticatedUser | null>;
   loginHandler: () => Promise<AuthenticatedUser | null>;
   logoutHandler: () => Promise<void>;
@@ -38,6 +40,32 @@ export const AuthContextProvider = ({
     roleName: "",
   });
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
+  const navigateTo = useNavigate();
+
+  const redirectByRole = async (user: AuthenticatedUser) => {
+    if (!user) {
+      console.warn("No user is logged in, cannot redirect by role.");
+      return;
+    }
+
+    switch (user.roleName) {
+      case "student":
+        navigateTo(`/complete-profile?userId=${user.id}`);
+        break;
+      case "teacher":
+        navigateTo("/teacher/dashboard");
+        break;
+      case "admin":
+        navigateTo("/admin/dashboard");
+        break;
+      default:
+        console.warn(
+          `Unknown role: ${user.roleName}. Cannot redirect to a specific dashboard.`
+        );
+        navigateTo("/login");
+        break;
+    }
+  };
 
   const registerHandler = async (): Promise<AuthenticatedUser | null> => {
     try {
@@ -57,6 +85,7 @@ export const AuthContextProvider = ({
       console.log("[📨] Respuesta del backend:", registeredUser);
       if (registeredUser) {
         setUser(registeredUser);
+        redirectByRole(registeredUser);
         return registeredUser;
       } else {
         return null;
@@ -107,6 +136,7 @@ export const AuthContextProvider = ({
         setLoginInputValue,
         user,
         setUser,
+        redirectByRole,
         registerHandler,
         loginHandler,
         logoutHandler,
