@@ -1,9 +1,8 @@
 import api from "../api/baseCall";
+import type { StudentForm } from "../utils/types";
 
 export const register = async (email: string, password: string, roleName: string) => {
     try {
-    console.log(`[🔗] POST a http://localhost:5204/api/auth/register`);
-    console.log("Payload:", { email, password, roleName });
         const response = await api.post("api/auth/register", {
             email,
             password,
@@ -11,9 +10,23 @@ export const register = async (email: string, password: string, roleName: string
         }, {
             withCredentials: true
         });
+
         return response.data || null;
     } catch (error) {
         console.error("Error during registration:", error);
+        return null;
+    }
+}
+
+export const createStudentProfile = async (studentData: StudentForm) => {
+    try {
+        const response = await api.post("api/student", studentData, {
+            withCredentials: true
+        });
+
+        return response.data || null;
+    } catch (error) {
+        console.error("Error creating student profile:", error);
         return null;
     }
 }
@@ -26,6 +39,7 @@ export const login = async (email: string, password: string) => {
         }, {
             withCredentials: true
         });
+
         return response.data || null;
     } catch (error) {
         console.error("Error during login:", error);
@@ -39,6 +53,7 @@ export const logout = async () => {
             {
             withCredentials: true
         });
+
         return response.data || null;
     } catch (error) {
         console.error("Error during logout:", error);
@@ -49,6 +64,7 @@ export const logout = async () => {
 export const getStudents = async () => {
     try {
         const response = await api.get(`/api/student`);
+
         return response.data || [];
     } catch (error) {
         console.error("Error calling students data:", error);
@@ -59,6 +75,7 @@ export const getStudents = async () => {
 export const getStudentById = async (studentId: number) => {
     try {
         const response = await api.get(`/api/student/${studentId}`)
+        
         return response.data || null;
     } catch (error) {
         console.error("Error calling student by ID:", error);
