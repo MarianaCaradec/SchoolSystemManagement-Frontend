@@ -23,6 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
+.history
 .env
 package-lock.json
 .vscode/
