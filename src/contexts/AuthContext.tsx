@@ -1,12 +1,14 @@
 import {
   createContext,
   useContext,
+  useEffect,
   useState,
   type SetStateAction,
 } from "react";
 import type { AuthenticatedUser, UserForm } from "../utils/types";
 import { login, logout, register } from "../api/apiHelpers";
 import { useNavigate } from "react-router-dom";
+import api from "../api/baseCall";
 
 interface AuthContextType {
   registrationInputValue: UserForm;
@@ -42,6 +44,26 @@ export const AuthContextProvider = ({
   const [user, setUser] = useState<AuthenticatedUser | null>(null);
   const navigateTo = useNavigate();
 
+  useEffect(() => {
+    const hasToken = document.cookie.includes("AuthToken=");
+
+    if (!hasToken) {
+      setUser(null);
+      console.warn("No AuthToken found in cookies, user is not authenticated.");
+      return;
+    }
+
+    const fetchUser = async () => {
+      try {
+        const res = await api.get("api/auth/me", { withCredentials: true });
+        setUser(res.data); // Set user in context
+      } catch {
+        setUser(null);
+      }
+    };
+    fetchUser();
+  }, []);
+
   const redirectByRole = async (user: AuthenticatedUser) => {
     if (!user) {
       console.warn("No user is logged in, cannot redirect by role.");
@@ -49,13 +71,13 @@ export const AuthContextProvider = ({
     }
 
     switch (user.roleName) {
-      case "student":
-        navigateTo(`/complete-profile?userId=${user.id}`);
+      case "Student":
+        navigateTo("/student/dashboard");
         break;
-      case "teacher":
+      case "Teacher":
         navigateTo("/teacher/dashboard");
         break;
-      case "admin":
+      case "Admin":
         navigateTo("/admin/dashboard");
         break;
       default:
@@ -85,7 +107,7 @@ export const AuthContextProvider = ({
       console.log("[📨] Respuesta del backend:", registeredUser);
       if (registeredUser) {
         setUser(registeredUser);
-        redirectByRole(registeredUser);
+        navigateTo("/login");
         return registeredUser;
       } else {
         return null;
@@ -98,13 +120,14 @@ export const AuthContextProvider = ({
 
   const loginHandler = async (): Promise<AuthenticatedUser | null> => {
     try {
-      const loggedUser = await login(
+      const loggedUser: AuthenticatedUser = await login(
         loginInputValue.email,
         loginInputValue.password
       );
 
       if (loggedUser) {
         setUser(loggedUser);
+        navigateTo(`/complete-profile?userId=${loggedUser.id}`);
         return loggedUser;
       } else {
         return null;
