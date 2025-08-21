@@ -1,19 +1,24 @@
 import "./App.css";
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthContextProvider } from "./contexts/AuthContext";
 import LogIn from "./pages/LogIn";
-import Registrarion from "./pages/Registration";
+import Registration from "./pages/Registration";
+import CompleteProfile from "./pages/CompleteProfile";
+import Home from "./pages/Home";
+import NavBar from "./components/NavBar";
 
 function App() {
   return (
     <>
       <BrowserRouter>
         <AuthContextProvider>
-          <div>
-            <h1>School System Management</h1>
-            <Registrarion />
-            <LogIn />
-          </div>
+          <NavBar />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/complete-profile" element={<CompleteProfile />} />
+            <Route path="/login" element={<LogIn />} />
+            <Route path="/register" element={<Registration />} />
+          </Routes>
         </AuthContextProvider>
       </BrowserRouter>
     </>
