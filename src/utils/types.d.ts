@@ -59,5 +59,5 @@ export interface StudentForm {
     address: string;
     mobileNumber: number;
     userId: AuthenticatedUser.id;
-    class: Class.id;
+    classId: number;
 }
