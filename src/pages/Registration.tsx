@@ -7,6 +7,7 @@ const Registration = () => {
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await registerHandler();
+    setRegistrationInputValue({ email: "", password: "", roleName: "" });
   };
 
   return (

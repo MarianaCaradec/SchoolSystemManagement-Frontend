@@ -8,6 +8,7 @@ const LogIn = () => {
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await loginHandler();
+    setLoginInputValue({ email: "", password: "" });
   };
 
   return (
