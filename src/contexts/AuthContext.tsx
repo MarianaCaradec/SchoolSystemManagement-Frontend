@@ -91,23 +91,18 @@ export const AuthContextProvider = ({
 
   const registerHandler = async (): Promise<AuthenticatedUser | null> => {
     try {
-      console.log(
-        "[⚡️] Intentando registrar usuario con datos:",
-        registrationInputValue
-      );
-
       const registeredUser = await register(
         registrationInputValue.email,
         registrationInputValue.password,
         registrationInputValue.roleName
           ? registrationInputValue.roleName
-          : "student"
+          : "Student"
       );
 
-      console.log("[📨] Respuesta del backend:", registeredUser);
       if (registeredUser) {
         setUser(registeredUser);
         navigateTo("/login");
+
         return registeredUser;
       } else {
         return null;
@@ -127,7 +122,55 @@ export const AuthContextProvider = ({
 
       if (loggedUser) {
         setUser(loggedUser);
-        navigateTo(`/complete-profile?userId=${loggedUser.id}`);
+
+        let userProfile;
+        let isProfileCompleted = false;
+
+        if (loggedUser.roleName === "Teacher") {
+          userProfile = await api.get(`api/teacher/${loggedUser.id}`, {
+            withCredentials: true,
+          });
+
+          const teacherData = userProfile.data;
+          isProfileCompleted =
+            !!teacherData.name &&
+            !!teacherData.surname &&
+            !!teacherData.birthDate &&
+            !!teacherData.address &&
+            !!teacherData.phoneNumber &&
+            !!teacherData.userId;
+
+          if (!isProfileCompleted) {
+            navigateTo(`/complete-profile?userId=${loggedUser.id}`);
+          } else {
+            redirectByRole(loggedUser);
+          }
+        } else if (loggedUser.roleName === "Student") {
+          userProfile = await api.get(`api/student/by-user/${loggedUser.id}`, {
+            withCredentials: true,
+          });
+
+          const studentData = userProfile.data;
+          isProfileCompleted =
+            !!studentData.name &&
+            !!studentData.surname &&
+            !!studentData.birthDate &&
+            !!studentData.address &&
+            !!studentData.mobileNumber &&
+            !!studentData.userId &&
+            !!studentData.classId;
+
+          console.log(studentData);
+
+          if (!isProfileCompleted) {
+            navigateTo(`/complete-profile?userId=${loggedUser.id}`);
+          } else {
+            redirectByRole(loggedUser);
+          }
+        } else {
+          redirectByRole(loggedUser);
+        }
+
         return loggedUser;
       } else {
         return null;
