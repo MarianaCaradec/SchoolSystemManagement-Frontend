@@ -1,49 +1,7 @@
-export interface Attendance {
-    id: number;
-    date: Date;
-    present: boolean;
-    studentId: number;
-}
-
-export interface Grade {
-    id: number;
-    value: number;
-    subjectName: string;
-    studentId: number;
-}
-
-export interface Class {
-    id: number;
-    course: string;
-    divition: string;
-    teacherIds: number[];
-    studentIds: number[];
-}
-
 export enum UserRole {
-    ADMIN = "admin",
-    TEACHER = "teacher",
-    STUDENT = "student"
-}
-
-export interface AuthenticatedUser {
-    id: number,
-    email: string;
-    role: UserRole;
-    roleName: string;
-}
-
-export interface Student {
-    id: number;
-    name: string;
-    surname: string;
-    birthDate: Date;
-    address: string;
-    emailRole: AuthenticatedUser;
-    mobileNumber: number;
-    class: Class;
-    attendances: Attendance[];
-    grades: Grade[];
+    ADMIN = "Admin",
+    TEACHER = "Teacher",
+    STUDENT = "Student"
 }
 
 export interface UserForm {
@@ -52,7 +10,14 @@ export interface UserForm {
     roleName?: string;
 }
 
-export interface StudentForm {
+export interface AuthenticatedUser { //AuthDto in backend
+    id: number,
+    email: string;
+    role: UserRole;
+    roleName: string;
+}
+
+export interface StudentForm { //StudentInputDto in backend
     name: string;
     surname: string;
     birthDate: Date;
@@ -60,4 +25,53 @@ export interface StudentForm {
     mobileNumber: number;
     userId: AuthenticatedUser.id;
     classId: number;
+}
+
+export interface Student { //StudentResponseDto in backend
+    id: number;
+    name: string;
+    surname: string;
+    birthDate: Date;
+    address: string;
+    mobileNumber: number;
+    emailRole: AuthenticatedUser;
+    class: Class;
+    attendances: Attendance[];
+    grades: Grade[];
+}
+
+export interface TeacherForm { //TeacherInputDto in backend
+    name: string;
+    surname: string;
+    birthDate: Date;
+    address: string;
+    mobileNumber: number;
+    userId: AuthenticatedUser.id;
+}
+
+export interface Class { //ClassDto in backend
+    id: number;
+    course: string;
+    divition: string;
+    teacherIds: number[];
+    studentIds: number[];
+}
+
+export interface Attendance { //AttendanceDto in backend
+    id: number;
+    date: Date;
+    present: boolean;
+    studentId?: number;
+    teacherId?: number;
+    studentUserId?: AuthenticatedUser.id;
+    teacherUserId?: AuthenticatedUser.id;
+}
+
+export interface Grade { //GradeDto in backend
+    id: number;
+    value: number;
+    date: Date;
+    studentId: number;
+    subjectId: number;
+    subjectName: string;
 }
