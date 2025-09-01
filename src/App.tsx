@@ -7,6 +7,7 @@ import CompleteProfile from "./pages/CompleteProfile";
 import Home from "./pages/Home";
 import NavBar from "./components/NavBar";
 import StudentDashboard from "./pages/StudentDashboard";
+import TeacherDashboard from "./pages/TeacherDashboard";
 
 function App() {
   return (
@@ -20,10 +21,7 @@ function App() {
             <Route path="/login" element={<LogIn />} />
             <Route path="/complete-profile" element={<CompleteProfile />} />
             <Route path="/student/dashboard" element={<StudentDashboard />} />
-            <Route
-              path="/teacher/dashboard"
-              element={<h1>Welcome to the Teacher Dashboard!</h1>}
-            />
+            <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
             <Route
               path="/admin/dashboard"
               element={<h1>Welcome to the Admin Dashboard!</h1>}
