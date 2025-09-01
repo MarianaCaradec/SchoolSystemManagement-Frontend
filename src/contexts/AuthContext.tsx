@@ -5,7 +5,12 @@ import {
   useState,
   type SetStateAction,
 } from "react";
-import type { AuthenticatedUser, UserForm } from "../utils/types";
+import type {
+  AuthenticatedUser,
+  StudentForm,
+  TeacherForm,
+  UserForm,
+} from "../utils/types";
 import { login, logout, register } from "../api/apiHelpers";
 import { useNavigate } from "react-router-dom";
 import api from "../api/baseCall";
@@ -56,7 +61,7 @@ export const AuthContextProvider = ({
     const fetchUser = async () => {
       try {
         const res = await api.get("api/auth/me", { withCredentials: true });
-        setUser(res.data); // Set user in context
+        setUser(res.data);
       } catch {
         setUser(null);
       }
@@ -91,12 +96,21 @@ export const AuthContextProvider = ({
 
   const registerHandler = async (): Promise<AuthenticatedUser | null> => {
     try {
+      let roleName = registrationInputValue.roleName
+        ? registrationInputValue.roleName
+        : "Student";
+
+      if (roleName === "Teacher") {
+        alert(
+          "You cannot register directly as a Teacher. You will be registered as a Student. Please contact the admin if you need your role changed."
+        );
+        roleName = "Student";
+      }
+
       const registeredUser = await register(
         registrationInputValue.email,
         registrationInputValue.password,
-        registrationInputValue.roleName
-          ? registrationInputValue.roleName
-          : "Student"
+        roleName
       );
 
       if (registeredUser) {
@@ -127,17 +141,17 @@ export const AuthContextProvider = ({
         let isProfileCompleted = false;
 
         if (loggedUser.roleName === "Teacher") {
-          userProfile = await api.get(`api/teacher/${loggedUser.id}`, {
+          userProfile = await api.get(`api/teacher/by-user/${loggedUser.id}`, {
             withCredentials: true,
           });
 
-          const teacherData = userProfile.data;
+          const teacherData: TeacherForm = userProfile.data;
           isProfileCompleted =
             !!teacherData.name &&
             !!teacherData.surname &&
             !!teacherData.birthDate &&
             !!teacherData.address &&
-            !!teacherData.phoneNumber &&
+            !!teacherData.mobileNumber &&
             !!teacherData.userId;
 
           if (!isProfileCompleted) {
@@ -150,7 +164,7 @@ export const AuthContextProvider = ({
             withCredentials: true,
           });
 
-          const studentData = userProfile.data;
+          const studentData: StudentForm = userProfile.data;
           isProfileCompleted =
             !!studentData.name &&
             !!studentData.surname &&

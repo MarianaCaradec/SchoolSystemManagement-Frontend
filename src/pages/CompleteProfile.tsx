@@ -1,19 +1,28 @@
 import { useState } from "react";
 import { useAuthContext } from "../contexts/AuthContext";
 import type { StudentForm } from "../utils/types";
-import { createStudentProfile } from "../api/apiHelpers";
+import { createStudentProfile, createTeacherProfile } from "../api/apiHelpers";
 
 const CompleteProfile = () => {
   const { redirectByRole } = useAuthContext();
   const user = useAuthContext().user;
+
+  const [teacherData, setTeacherData] = useState({
+    name: "",
+    surname: "",
+    birthDate: new Date(),
+    address: "",
+    mobileNumber: 0,
+    userId: user?.id || 0,
+  });
   const [studentData, setStudentData] = useState<StudentForm>({
     name: "",
     surname: "",
     birthDate: new Date(),
     address: "",
     mobileNumber: 0,
-    userId: user?.id || 0, // Ensure userId is set from the authenticated user
-    classId: 0, // Optional, can be set later
+    userId: user?.id || 0,
+    classId: 0,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -28,7 +37,24 @@ const CompleteProfile = () => {
       return;
     }
 
-    const payload = {
+    const teacherPayload = {
+      ...teacherData,
+      birthDate: studentData.birthDate
+        ? new Date(studentData.birthDate).toISOString().split("T")[0]
+        : "",
+      userId: user.id,
+    };
+
+    const teacherResponse = await createTeacherProfile(teacherPayload as any);
+
+    if (teacherResponse) {
+      setTeacherData(teacherResponse.data);
+      await redirectByRole(user);
+    } else {
+      console.error("Failed to create teacher profile.");
+    }
+
+    const studentPayload = {
       ...studentData,
       birthDate: studentData.birthDate
         ? new Date(studentData.birthDate).toISOString().split("T")[0]
@@ -37,10 +63,10 @@ const CompleteProfile = () => {
       classId: studentData.classId,
     };
 
-    const response = await createStudentProfile(payload as any);
+    const studentResponse = await createStudentProfile(studentPayload as any);
 
-    if (response) {
-      setStudentData(response.data);
+    if (studentResponse) {
+      setStudentData(studentResponse.data);
       await redirectByRole(user);
     } else {
       console.error("Failed to create student profile.");
