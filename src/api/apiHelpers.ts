@@ -1,5 +1,5 @@
 import api from "../api/baseCall";
-import type { StudentForm } from "../utils/types";
+import type { StudentForm, TeacherForm } from "../utils/types";
 
 export const register = async (email: string, password: string, roleName: string) => {
     try {
@@ -20,13 +20,28 @@ export const register = async (email: string, password: string, roleName: string
 
 export const createStudentProfile = async (studentData: StudentForm) => {
     try {
-        const response = await api.post("api/student", studentData, {
-            withCredentials: true
-        });
+        const response = await api.post("api/student", 
+            studentData, 
+            {withCredentials: true}
+        );
 
         return response.data || null;
     } catch (error) {
         console.error("Error creating student profile:", error);
+        return null;
+    }
+}
+
+export const createTeacherProfile = async (teacherData: TeacherForm) => {
+    try {
+        const response = await api.post("api/teacher", 
+            teacherData, 
+            {withCredentials: true}
+        );
+
+        return response.data || null;
+    } catch (error) {
+        console.error("Error creating teacher profile:", error);
         return null;
     }
 }
