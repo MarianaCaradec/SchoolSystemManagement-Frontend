@@ -10,11 +10,19 @@ export interface UserForm {
     roleName?: string;
 }
 
+export interface UserToBeUpdatedForm {
+    id?: number;
+    email?: string;
+    password?: string;
+    roleName?: string;
+}
+
 export interface AuthenticatedUser { //AuthDto in backend
     id: number,
     email: string;
     role: UserRole;
     roleName: string;
+    hasProfile: boolean;
 }
 
 export interface StudentForm { //StudentInputDto in backend
