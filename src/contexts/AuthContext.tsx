@@ -5,12 +5,7 @@ import {
   useState,
   type SetStateAction,
 } from "react";
-import type {
-  AuthenticatedUser,
-  StudentForm,
-  TeacherForm,
-  UserForm,
-} from "../utils/types";
+import type { AuthenticatedUser, UserForm } from "../utils/types";
 import { login, logout, register } from "../api/apiHelpers";
 import { useNavigate } from "react-router-dom";
 import api from "../api/baseCall";
@@ -96,9 +91,7 @@ export const AuthContextProvider = ({
 
   const registerHandler = async (): Promise<AuthenticatedUser | null> => {
     try {
-      let roleName = registrationInputValue.roleName
-        ? registrationInputValue.roleName
-        : "Student";
+      let roleName = registrationInputValue.roleName || "Student";
 
       if (roleName === "Teacher") {
         alert(
@@ -128,70 +121,79 @@ export const AuthContextProvider = ({
   };
 
   const loginHandler = async (): Promise<AuthenticatedUser | null> => {
-    try {
-      const loggedUser: AuthenticatedUser = await login(
-        loginInputValue.email,
-        loginInputValue.password
-      );
+    const loggedUser: AuthenticatedUser = await login(
+      loginInputValue.email,
+      loginInputValue.password
+    );
 
-      if (loggedUser) {
-        setUser(loggedUser);
-
-        let userProfile;
-        let isProfileCompleted = false;
-
-        if (loggedUser.roleName === "Teacher") {
-          userProfile = await api.get(`api/teacher/by-user/${loggedUser.id}`, {
-            withCredentials: true,
-          });
-
-          const teacherData: TeacherForm = userProfile.data;
-          isProfileCompleted =
-            !!teacherData.name &&
-            !!teacherData.surname &&
-            !!teacherData.birthDate &&
-            !!teacherData.address &&
-            !!teacherData.mobileNumber &&
-            !!teacherData.userId;
-
-          if (!isProfileCompleted) {
-            navigateTo(`/complete-profile?userId=${loggedUser.id}`);
-          } else {
-            redirectByRole(loggedUser);
-          }
-        } else if (loggedUser.roleName === "Student") {
-          userProfile = await api.get(`api/student/by-user/${loggedUser.id}`, {
-            withCredentials: true,
-          });
-
-          const studentData: StudentForm = userProfile.data;
-          isProfileCompleted =
-            !!studentData.name &&
-            !!studentData.surname &&
-            !!studentData.birthDate &&
-            !!studentData.address &&
-            !!studentData.mobileNumber &&
-            !!studentData.userId &&
-            !!studentData.classId;
-
-          console.log(studentData);
-
-          if (!isProfileCompleted) {
-            navigateTo(`/complete-profile?userId=${loggedUser.id}`);
-          } else {
-            redirectByRole(loggedUser);
-          }
-        } else {
-          redirectByRole(loggedUser);
-        }
-
-        return loggedUser;
-      } else {
-        return null;
-      }
-    } catch (error) {
-      console.error("Error during login:", error);
+    if (!loggedUser) {
       return null;
+    }
+
+    setUser(loggedUser);
+
+    const isNewUser = !loggedUser.hasProfile;
+
+    if (
+      isNewUser &&
+      (loggedUser.roleName === "Student" || loggedUser.roleName === "Teacher")
+    ) {
+      navigateTo(`/complete-profile?userId=${loggedUser.id}`);
+      return loggedUser;
+    } else if (loggedUser.roleName === "Admin") {
+      navigateTo("/admin/dashboard");
+      return loggedUser;
+    }
+
+    try {
+      let isProfileCompleted = false;
+
+      if (loggedUser.roleName === "Student") {
+        const { data: studentData } = await api.get(
+          `api/student/by-user/${loggedUser.id}`,
+          {
+            withCredentials: true,
+          }
+        );
+
+        isProfileCompleted =
+          !!studentData.name &&
+          !!studentData.surname &&
+          !!studentData.birthDate &&
+          !!studentData.address &&
+          !!studentData.mobileNumber &&
+          !!studentData.userId &&
+          !!studentData.classId;
+
+        console.log(studentData);
+      } else if (loggedUser.roleName === "Teacher") {
+        const { data: teacherData } = await api.get(
+          `api/teacher/by-user/${loggedUser.id}`,
+          {
+            withCredentials: true,
+          }
+        );
+
+        isProfileCompleted =
+          !!teacherData.name &&
+          !!teacherData.surname &&
+          !!teacherData.birthDate &&
+          !!teacherData.address &&
+          !!teacherData.mobileNumber &&
+          !!teacherData.userId;
+      }
+
+      if (!isProfileCompleted) {
+        navigateTo(`/complete-profile?userId=${loggedUser.id}`);
+      } else {
+        redirectByRole(loggedUser);
+      }
+
+      return loggedUser;
+    } catch (error) {
+      console.warn("Profile fetch failed — assuming incomplete profile.");
+      navigateTo(`/complete-profile?userId=${loggedUser.id}`);
+      return loggedUser;
     }
   };
 
