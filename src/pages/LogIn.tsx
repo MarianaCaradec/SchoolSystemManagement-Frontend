@@ -20,6 +20,7 @@ const LogIn = () => {
           onChange={(e) =>
             setLoginInputValue({ ...loginInputValue, email: e.target.value })
           }
+          placeholder="Email"
           required
         />
         <input
@@ -31,6 +32,7 @@ const LogIn = () => {
               password: e.target.value,
             })
           }
+          placeholder="Password"
           required
         />
         <button type="submit">Login</button>

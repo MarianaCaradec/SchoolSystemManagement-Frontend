@@ -22,6 +22,7 @@ const Registration = () => {
               email: e.target.value,
             })
           }
+          placeholder="Email"
           required
         />
         <input
@@ -33,6 +34,7 @@ const Registration = () => {
               password: e.target.value,
             })
           }
+          placeholder="Password"
           required
         />
         <input
@@ -44,6 +46,7 @@ const Registration = () => {
               roleName: e.target.value,
             })
           }
+          placeholder="Role (e.g., student, teacher, admin)"
         />
         <button type="submit">Register</button>
       </form>
