@@ -5,7 +5,7 @@ import { createStudentProfile, createTeacherProfile } from "../api/apiHelpers";
 
 const CompleteProfile = () => {
   const { redirectByRole } = useAuthContext();
-  const user = useAuthContext().user;
+  const { user } = useAuthContext();
 
   const [teacherData, setTeacherData] = useState({
     name: "",
@@ -27,6 +27,7 @@ const CompleteProfile = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!user?.id) {
       console.error("No authenticated user found.");
       return;
@@ -35,23 +36,6 @@ const CompleteProfile = () => {
     if (!studentData) {
       console.error("Student data is not set.");
       return;
-    }
-
-    const teacherPayload = {
-      ...teacherData,
-      birthDate: studentData.birthDate
-        ? new Date(studentData.birthDate).toISOString().split("T")[0]
-        : "",
-      userId: user.id,
-    };
-
-    const teacherResponse = await createTeacherProfile(teacherPayload as any);
-
-    if (teacherResponse) {
-      setTeacherData(teacherResponse.data);
-      await redirectByRole(user);
-    } else {
-      console.error("Failed to create teacher profile.");
     }
 
     const studentPayload = {
@@ -66,10 +50,32 @@ const CompleteProfile = () => {
     const studentResponse = await createStudentProfile(studentPayload as any);
 
     if (studentResponse) {
-      setStudentData(studentResponse.data);
+      setStudentData(studentResponse);
       await redirectByRole(user);
     } else {
       console.error("Failed to create student profile.");
+    }
+
+    if (!teacherData) {
+      console.error("Teacher data is not set.");
+      return;
+    }
+
+    const teacherPayload = {
+      ...teacherData,
+      birthDate: studentData.birthDate
+        ? new Date(studentData.birthDate).toISOString().split("T")[0]
+        : "",
+      userId: user.id,
+    };
+
+    const teacherResponse = await createTeacherProfile(teacherPayload as any);
+
+    if (teacherResponse) {
+      setTeacherData(teacherResponse);
+      await redirectByRole(user);
+    } else {
+      console.error("Failed to create teacher profile.");
     }
   };
 
